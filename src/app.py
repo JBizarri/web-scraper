@@ -1,11 +1,6 @@
 from fastapi import FastAPI
 
-from .scraper import scraper
+from .image import router as image_router
 
 app = FastAPI()
-
-
-@app.post("/seed")
-async def seed() -> list[str]:
-    result = scraper.run()
-    return result
+app.include_router(image_router)

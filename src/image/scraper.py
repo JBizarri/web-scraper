@@ -4,7 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
-class Scraper:
+class ImageScraper:
     def _get_options(self):
         chrome_options = Options()
         chrome_options.add_argument("--no-sandbox")
@@ -15,10 +15,10 @@ class Scraper:
     def _get_browser(self):
         return webdriver.Chrome(options=self._get_options())
 
-    def run(self) -> list[str]:
+    def get_urls(self, search: str) -> list[str]:
         browser = self._get_browser()
 
-        browser.get("https://www.google.com")
+        browser.get("https://www.freeimages.com/")
         url = browser.current_url
 
         browser.quit()
