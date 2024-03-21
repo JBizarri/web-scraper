@@ -6,19 +6,19 @@ from typing import Optional
 class Database:
     def __init__(self, path: Optional[str] = None) -> None:
         self._path = path
+        self._connection = sqlite3.connect(self._path or ":memory:", check_same_thread=False)
+        self._connection.row_factory = sqlite3.Row
 
     @property
     @contextmanager
-    def connection(self):
-        connection = sqlite3.connect(self._path or ":memory:", check_same_thread=False)
-        connection.row_factory = sqlite3.Row
-
+    def cursor(self):
+        cursor = self._connection.cursor()
         try:
-            yield connection
-        except Exception:
-            connection.rollback()
-            connection.close()
+            yield cursor
+        except Exception as exc:
+            self._connection.rollback()
+            raise exc
         else:
-            connection.commit()
+            self._connection.commit()
         finally:
-            connection.close()
+            cursor.close()

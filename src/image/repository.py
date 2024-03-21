@@ -11,8 +11,7 @@ class ImageRepository:
         self.init()
 
     def init(self):
-        with self._database.connection as conn:
-            cursor = conn.cursor()
+        with self._database.cursor as cursor:
             table_exists = cursor.execute(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name = ?", (ImageRepository.__table_name__,)
             ).fetchone()
@@ -22,8 +21,7 @@ class ImageRepository:
                 )
 
     def save_urls(self, search_term: str, urls: list[str]):
-        with self._database.connection as conn:
-            cursor = conn.cursor()
+        with self._database.cursor as cursor:
             data = [{"search_term": search_term, "url": url} for url in urls]
             cursor.executemany(
                 f"INSERT OR IGNORE INTO {ImageRepository.__table_name__} (search_term, url) VALUES(:search_term, :url)",
@@ -31,7 +29,6 @@ class ImageRepository:
             )
 
     def list(self):
-        with self._database.connection as conn:
-            cursor = conn.cursor()
+        with self._database.cursor as cursor:
             rows = cursor.execute(f"SELECT * FROM {ImageRepository.__table_name__}").fetchall()
             return [dict(row) for row in rows]

@@ -62,18 +62,6 @@ RUN cp /usr/local/bin/chromedriver-linux64/chromedriver /usr/local/bin/ \
 
 WORKDIR /app
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
-ARG UID=10001
-RUN adduser \
-  --disabled-password \
-  --gecos "" \
-  --home "/nonexistent" \
-  --shell "/sbin/nologin" \
-  --no-create-home \
-  --uid "${UID}" \
-  appuser
-
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
 # Leverage a bind mount to requirements.txt to avoid having to copy them into
@@ -84,9 +72,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # set display port to avoid crash
 ENV DISPLAY=:99
-
-# Switch to the non-privileged user to run the application.
-USER appuser
 
 # Copy the source code into the container.
 COPY . .
