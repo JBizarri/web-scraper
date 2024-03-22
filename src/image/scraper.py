@@ -26,6 +26,7 @@ class ImageScraper:
     def _get_options(self):
         chrome_options = Options()
         chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument('--disable-dev-shm-usage')        
         if os.getenv("Environment", "production") == "production":
             chrome_options.add_argument("--headless")
         return chrome_options
@@ -59,7 +60,7 @@ class ImageScraper:
         while len(photos) < size:
             try:
                 photos_in_grid = WebDriverWait(browser, 10).until(
-                    EC.visibility_of_all_elements_located((By.CLASS_NAME, "yGh0CfFS4AMLWjEE9W7v"))
+                    EC.visibility_of_all_elements_located((By.XPATH, "*//picture//img"))
                 )
             except Exception as exc:
                 raise HTTPException(500, "Could not find the photos grid.") from exc
