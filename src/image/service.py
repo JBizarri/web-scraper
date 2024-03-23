@@ -1,4 +1,6 @@
 from fastapi import HTTPException
+
+from .schema import ImageSchema
 from .scraper import ImageScraper
 from .repository import ImageRepository
 
@@ -12,7 +14,10 @@ class ImageService:
         if not (urls := self._scraper.get_urls(search, size)):
             raise HTTPException(500, "Could not find the URLs")
 
-        self._repository.save_urls(search, urls)
+        images = [ImageSchema(search_term=search, url=url) for url in urls]
+
+        self._repository.save_urls(images)
+        return images
 
     def list(self):
         return self._repository.list()

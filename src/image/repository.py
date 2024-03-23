@@ -1,6 +1,5 @@
-import sqlite3
-
 from ..database import Database
+from .schema import ImageSchema
 
 
 class ImageRepository:
@@ -20,15 +19,15 @@ class ImageRepository:
                     f"CREATE TABLE {ImageRepository.__table_name__}(search_term VARCHAR, url TEXT, UNIQUE(search_term, url))"
                 )
 
-    def save_urls(self, search_term: str, urls: list[str]):
+    def save_urls(self, urls: list[ImageSchema]):
         with self._database.cursor as cursor:
-            data = [{"search_term": search_term, "url": url} for url in urls]
+            data = [url.model_dump() for url in urls]
             cursor.executemany(
                 f"INSERT OR IGNORE INTO {ImageRepository.__table_name__} (search_term, url) VALUES(:search_term, :url)",
                 data,
             )
 
-    def list(self):
+    def list(self) -> list[ImageSchema]:
         with self._database.cursor as cursor:
             rows = cursor.execute(f"SELECT * FROM {ImageRepository.__table_name__}").fetchall()
-            return [dict(row) for row in rows]
+            return [ImageSchema.model_validate(dict(row)) for row in rows]
